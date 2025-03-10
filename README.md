@@ -5,6 +5,10 @@ FreeBSD [port][4] script for `opengist`.
 
 You can find `opengist` [here][1]
 
+> Adds LDAP support via https://github.com/thomiceli/opengist/pull/385
+
+> NOTE: This is not commited into mainline ports tree.
+
 Installation
 ------------
 

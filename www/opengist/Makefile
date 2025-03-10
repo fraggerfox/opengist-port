@@ -1,17 +1,23 @@
 PORTNAME=	opengist
-PORTVERSION=	1.9.1
+PORTVERSION=	${GH_TAG}.g20250204
 DISTVERSIONPREFIX=	v
-CATEGORIES=	www textproc
-MASTER_SITES=	LOCAL/fox/:js
-DISTFILES=	opengist-${DISTVERSION}-node_modules.tgz:js
+CATEGORIES= 	wip www textproc
+MASTER_SITES=	https://raw.githubusercontent.com/${GH_ACCOUNT}/${GH_PROJECT}/v${GH_TAG}/${WRKSRC_SUBDIR:?${WRKSRC_SUBDIR}/:} \
+		https://codeload.github.com/${GH_ACCOUNT}/${GH_PROJECT}/tar.gz/v${GH_TAG}?dummy=/ \
+		LOCAL/fox/:js \
+		https://raw.githubusercontent.com/fraggerfox/opengist/refs/heads/introduce-ldap-authentication/:go
+DISTFILES=	${GH_PROJECT}-${GH_TAG}-node_modules.tgz:js \
+		go.mod:go \
+		${GH_ACCOUNT}-${GH_PROJECT}-v${GH_TAG}_GH0.tar.gz
 
-PATCH_SITES=	https://github.com/fraggerfox/${PORTNAME}/commit/
-PATCHFILES=	00fe79804e37f8622db23acd1e61f6212aef1f78.patch:-p1
+PATCH_SITES=    https://github.com/fraggerfox/${PORTNAME}/commit/
+PATCHFILES=     00fe79804e37f8622db23acd1e61f6212aef1f78.patch:-p1
 
 MAINTAINER=	fox@FreeBSD.org
 COMMENT=	Self-hosted pastebin powered by Git, open-source alternative to Github Gist.
 WWW=		https://opengist.io/
 
+CONFLICTS_INSTALL=      opengist
 LICENSE=	AGPLv3
 
 BROKEN_i386=	fails to build
@@ -24,20 +30,19 @@ USES=		go:1.23,modules nodejs:20,build
 USE_GITHUB=	nodefault
 GH_ACCOUNT=	thomiceli
 GH_PROJECT=	opengist
+GH_TAG=		1.9.1
 USE_RC_SUBR=	opengist
 
 GO_MODULE=	github.com/thomiceli/opengist
+GO_MOD_DIST=	github
 GO_TARGET=	.
 GO_BUILDFLAGS=	-tags fs_embed \
 		-ldflags="-X github.com/thomiceli/opengist/internal/config.OpengistVersion=v${DISTVERSION}"
 GO_ENV+=	GOTOOLCHAIN=local+path
+WRKSRC=		${WRKDIR}/${GH_PROJECT}-${GH_TAG}
 
 GROUP=		opengist
 USER=		opengist
-
-post-fetch:
-	@${FETCH_CMD} -o ${DISTDIR}/${DIST_SUBDIR}/patched.mod https://raw.githubusercontent.com/fraggerfox/opengist/refs/heads/introduce-ldap-authentication/go.mod
-	cp ${DISTDIR}/${DIST_SUBDIR}/patched.mod ${DISTDIR}/${DIST_SUBDIR}/v1.9.1.mod
 
 post-extract:
 	@${RLN} ${WRKDIR}/node_modules ${WRKSRC}/node_modules
@@ -45,10 +50,6 @@ post-extract:
 post-patch:
 	@${REINPLACE_CMD} -e 's|opengist.db|file:/var/db/${PORTNAME}/opengist.db|g' \
 		${WRKSRC}/config.yml
-	@${ECHO_MSG} "===> Tidying ${GO_MODNAME} dependencies 2";
-	@(cd ${GO_WRKSRC}; ${SETENVI} ${WRK_ENV} ${MAKE_ENV} ${GO_ENV} \
-		GOPROXY=${GO_MODCACHE} ${GO_CMD} mod tidy -e)
-	@${ECHO_MSG} "===> Vendoring ${GO_MODNAME} dependencies 2";
 	@(cd ${GO_WRKSRC}; ${SETENVI} ${WRK_ENV} ${MAKE_ENV} ${GO_ENV} \
 		GOPROXY=${GO_MODCACHE} ${GO_CMD} mod vendor -e)
 
