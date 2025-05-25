@@ -1,17 +1,16 @@
 PORTNAME=	opengist
-PORTVERSION=	${GH_TAG}.g20250204
+PORTVERSION=	${GH_TAG}.g20250515
 DISTVERSIONPREFIX=	v
 CATEGORIES= 	wip www textproc
-MASTER_SITES=	https://raw.githubusercontent.com/${GH_ACCOUNT}/${GH_PROJECT}/v${GH_TAG}/${WRKSRC_SUBDIR:?${WRKSRC_SUBDIR}/:} \
+MASTER_SITES=	https://raw.githubusercontent.com/thomiceli/opengist/refs/heads/master/:go \
 		https://codeload.github.com/${GH_ACCOUNT}/${GH_PROJECT}/tar.gz/v${GH_TAG}?dummy=/ \
-		LOCAL/fox/:js \
-		https://raw.githubusercontent.com/fraggerfox/opengist/refs/heads/introduce-ldap-authentication/:go
+		LOCAL/fox/:js
 DISTFILES=	${GH_PROJECT}-${GH_TAG}-node_modules.tgz:js \
 		go.mod:go \
 		${GH_ACCOUNT}-${GH_PROJECT}-v${GH_TAG}_GH0.tar.gz
 
-PATCH_SITES=    https://github.com/fraggerfox/${PORTNAME}/commit/
-PATCHFILES=     00fe79804e37f8622db23acd1e61f6212aef1f78.patch:-p1
+PATCH_SITES=    https://github.com/thomiceli/${PORTNAME}/compare/
+PATCHFILES=     v1.10.0...master.patch:-p1
 
 MAINTAINER=	fox@FreeBSD.org
 COMMENT=	Self-hosted pastebin powered by Git, open-source alternative to Github Gist.
@@ -25,12 +24,12 @@ BROKEN_i386=	fails to build
 BUILD_DEPENDS=	npm${NODEJS_SUFFIX}>0:www/npm${NODEJS_SUFFIX}
 RUN_DEPENDS=	git:devel/git
 
-USES=		go:1.23,modules nodejs:20,build
+USES=		go:1.24,modules nodejs:20,build
 
 USE_GITHUB=	nodefault
 GH_ACCOUNT=	thomiceli
 GH_PROJECT=	opengist
-GH_TAG=		1.9.1
+GH_TAG=		1.10.0
 USE_RC_SUBR=	opengist
 
 GO_MODULE=	github.com/thomiceli/opengist
